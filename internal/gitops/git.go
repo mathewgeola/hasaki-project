@@ -159,7 +159,12 @@ func Push(dirPath string) {
 	}
 
 	if err := runGitCmdWithOutput("push", "-f", "origin", "main"); err != nil {
-		fmt.Println("❌ 错误: git push 执行失败")
+		fmt.Println("❌ 错误: git push 代码执行失败")
+		os.Exit(1)
+	}
+
+	if err := runGitCmdWithOutput("push", "origin", "--tags"); err != nil {
+		fmt.Println("❌ 错误: git push tags 执行失败")
 		os.Exit(1)
 	}
 }
