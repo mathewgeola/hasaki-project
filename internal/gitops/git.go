@@ -126,6 +126,32 @@ func VersionCommit(dirPath string) {
 	}
 }
 
+func CreateTag(dirPath string) {
+	if err := ensureGitEnv(dirPath); err != nil {
+		fmt.Printf("❌ 环境校验失败: %v\n", err)
+		os.Exit(1)
+	}
+
+	data, err := os.ReadFile("VERSION")
+	if err != nil {
+		fmt.Printf("❌ 错误: 无法读取 VERSION 文件，请确保目录下存在该文件。\n详细信息: %v\n", err)
+		os.Exit(1)
+	}
+
+	rawVersion := strings.TrimSpace(string(data))
+	if rawVersion == "" {
+		fmt.Println("❌ 错误: VERSION 文件内容为空。")
+		os.Exit(1)
+	}
+
+	tagName := "v" + rawVersion
+
+	if err := runGitCmdWithOutput("tag", tagName); err != nil {
+		fmt.Printf("❌ 错误: 创建本地 Tag '%s' 失败，可能该版本号对应的 Tag 已存在。\n", tagName)
+		os.Exit(1)
+	}
+}
+
 func Push(dirPath string) {
 	if err := ensureGitEnv(dirPath); err != nil {
 		fmt.Printf("❌ 环境校验失败: %v\n", err)
