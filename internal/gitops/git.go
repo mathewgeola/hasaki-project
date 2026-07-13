@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 )
 
 func ensureGitEnv(dirPath string) error {
-	if dirPath == "" {
+	if dirPath == "" || dirPath == "." {
 		currentDir, err := os.Getwd()
 		if err != nil {
 			return fmt.Errorf("无法获取当前工作目录: %w", err)
@@ -23,6 +24,12 @@ func ensureGitEnv(dirPath string) error {
 			dirPath = strings.Replace(dirPath, "~", home, 1)
 		}
 	}
+
+	absPath, err := filepath.Abs(dirPath)
+	if err != nil {
+		return fmt.Errorf("无法将路径转换为绝对路径 '%s': %w", dirPath, err)
+	}
+	dirPath = absPath
 
 	info, err := os.Stat(dirPath)
 	if err != nil || !info.IsDir() {
@@ -55,7 +62,7 @@ func runGitCmdWithOutput(args ...string) error {
 
 func Commit(dirPath string) {
 	if err := ensureGitEnv(dirPath); err != nil {
-		fmt.Printf("❌ 环境校验失败: %v\n", err)
+		fmt.Printf("[×] 环境校验失败: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -63,42 +70,44 @@ func Commit(dirPath string) {
 
 	baseHash, err := runGitCmd("merge-base", "HEAD", "origin/main")
 	if err != nil || baseHash == "" {
-		fmt.Println("❌ 错误: 无法找到 HEAD 与 origin/main 的 merge-base。")
+		fmt.Println("[×] 错误: 无法找到 HEAD 与 origin/main 的 merge-base。")
 		fmt.Println("请确认远程是否存在 main 分支，并且本地已执行过 git fetch。")
 		os.Exit(1)
 	}
 
 	if _, err := runGitCmd("reset", baseHash); err != nil {
-		fmt.Println("❌ 错误: git reset 执行失败")
+		fmt.Println("[×] 错误: git reset 执行失败")
 		os.Exit(1)
 	}
 
 	if _, err := runGitCmd("add", "-A"); err != nil {
-		fmt.Println("❌ 错误: git add 执行失败")
+		fmt.Println("[×] 错误: git add 执行失败")
 		os.Exit(1)
 	}
 
 	if err := runGitCmdWithOutput("commit", "-m", now); err != nil {
-		fmt.Println("❌ 错误: git commit 执行失败")
+		fmt.Println("[×] 错误: git commit 执行失败")
 		os.Exit(1)
 	}
+
+	fmt.Printf("[√] 成功: 标准代码提交完毕 (Message: %s)\n", now)
 }
 
 func VersionCommit(dirPath string) {
 	if err := ensureGitEnv(dirPath); err != nil {
-		fmt.Printf("❌ 环境校验失败: %v\n", err)
+		fmt.Printf("[×] 环境校验失败: %v\n", err)
 		os.Exit(1)
 	}
 
 	data, err := os.ReadFile("VERSION")
 	if err != nil {
-		fmt.Printf("❌ 错误: 无法读取 VERSION 文件，请确保目录下存在该文件。\n详细信息: %v\n", err)
+		fmt.Printf("[×] 错误: 无法读取 VERSION 文件，请确保目录下存在该文件。\n详细信息: %v\n", err)
 		os.Exit(1)
 	}
 
 	rawVersion := strings.TrimSpace(string(data))
 	if rawVersion == "" {
-		fmt.Println("❌ 错误: VERSION 文件内容为空。")
+		fmt.Println("[×] 错误: VERSION 文件内容为空。")
 		os.Exit(1)
 	}
 
@@ -106,65 +115,71 @@ func VersionCommit(dirPath string) {
 
 	baseHash, err := runGitCmd("merge-base", "HEAD", "origin/main")
 	if err != nil || baseHash == "" {
-		fmt.Println("❌ 错误: 无法找到 HEAD 与 origin/main 的 merge-base。")
+		fmt.Println("[×] 错误: 无法找到 HEAD 与 origin/main 的 merge-base。")
 		os.Exit(1)
 	}
 
 	if _, err := runGitCmd("reset", baseHash); err != nil {
-		fmt.Println("❌ 错误: git reset 执行失败")
+		fmt.Println("[×] 错误: git reset 执行失败")
 		os.Exit(1)
 	}
 
 	if _, err := runGitCmd("add", "-A"); err != nil {
-		fmt.Println("❌ 错误: git add 执行失败")
+		fmt.Println("[×] 错误: git add 执行失败")
 		os.Exit(1)
 	}
 
 	if err := runGitCmdWithOutput("commit", "-m", commitMsg); err != nil {
-		fmt.Println("❌ 错误: git commit 执行失败")
+		fmt.Println("[×] 错误: git commit 执行失败")
 		os.Exit(1)
 	}
+
+	fmt.Printf("[√] 成功: 版本代码提交完毕 (Version: %s)\n", commitMsg)
 }
 
 func CreateTag(dirPath string) {
 	if err := ensureGitEnv(dirPath); err != nil {
-		fmt.Printf("❌ 环境校验失败: %v\n", err)
+		fmt.Printf("[×] 环境校验失败: %v\n", err)
 		os.Exit(1)
 	}
 
 	data, err := os.ReadFile("VERSION")
 	if err != nil {
-		fmt.Printf("❌ 错误: 无法读取 VERSION 文件，请确保目录下存在该文件。\n详细信息: %v\n", err)
+		fmt.Printf("[×] 错误: 无法读取 VERSION 文件，请确保目录下存在该文件。\n详细信息: %v\n", err)
 		os.Exit(1)
 	}
 
 	rawVersion := strings.TrimSpace(string(data))
 	if rawVersion == "" {
-		fmt.Println("❌ 错误: VERSION 文件内容为空。")
+		fmt.Println("[×] 错误: VERSION 文件内容为空。")
 		os.Exit(1)
 	}
 
 	tagName := "v" + rawVersion
 
 	if err := runGitCmdWithOutput("tag", tagName); err != nil {
-		fmt.Printf("❌ 错误: 创建本地 Tag '%s' 失败，可能该版本号对应的 Tag 已存在。\n", tagName)
+		fmt.Printf("[×] 错误: 创建本地 Tag '%s' 失败，可能该版本号对应的 Tag 已存在。\n", tagName)
 		os.Exit(1)
 	}
+
+	fmt.Printf("[√] 成功: 本地标签创建完毕 (Tag: %s)\n", tagName)
 }
 
 func Push(dirPath string) {
 	if err := ensureGitEnv(dirPath); err != nil {
-		fmt.Printf("❌ 环境校验失败: %v\n", err)
+		fmt.Printf("[×] 环境校验失败: %v\n", err)
 		os.Exit(1)
 	}
 
 	if err := runGitCmdWithOutput("push", "-f", "origin", "main"); err != nil {
-		fmt.Println("❌ 错误: git push 代码执行失败")
+		fmt.Println("[×] 错误: git push 代码执行失败")
 		os.Exit(1)
 	}
 
 	if err := runGitCmdWithOutput("push", "origin", "--tags"); err != nil {
-		fmt.Println("❌ 错误: git push tags 执行失败")
+		fmt.Println("[×] 错误: git push tags 执行失败")
 		os.Exit(1)
 	}
+
+	fmt.Println("[√] 成功: 代码及所有标签已成功强制推送到 origin/main")
 }
