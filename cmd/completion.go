@@ -14,21 +14,25 @@ var completionCmd = &cobra.Command{
 【快速配置指南】
 
 Bash 用户:
+  安装环境: sudo apt install bash-completion
   进入环境: bash (通常大部分 Linux/Mac 系统已内置)
   临时体验: source <(hp completion bash)
   永久生效: 
     mkdir -p ~/.local/share/bash-completion/completions
     hp completion bash > ~/.local/share/bash-completion/completions/hp
+	echo 'source /usr/share/bash-completion/bash_completion' >> ~/.bashrc
+	source ~/.bashrc
 
 Zsh 用户:
-  安装环境: sudo apt install zsh (Mac 默认已内置)
-  进入环境: zsh
+  安装环境: sudo apt install zsh
+  进入环境: zsh (Mac 默认已内置)
   临时体验: source <(hp completion zsh)
   永久生效: 
     mkdir -p ~/.zfunc
     hp completion zsh > ~/.zfunc/_hp
     echo 'fpath=(~/.zfunc $fpath)' >> ~/.zshrc
     echo 'compinit' >> ~/.zshrc
+	source ~/.zshrc
 
 Fish 用户:
   安装环境: sudo apt install fish
@@ -38,8 +42,8 @@ Fish 用户:
     hp completion fish > ~/.config/fish/completions/hp.fish
 
 PowerShell 用户:
-  安装环境: sudo snap install powershell --classic (Windows 默认已内置)
-  进入环境: pwsh
+  安装环境: sudo snap install powershell --classic
+  进入环境: pwsh (Windows 默认已内置)
   临时体验: hp completion powershell | Out-String | Invoke-Expression
   永久生效: 
     hp completion powershell >> $PROFILE
