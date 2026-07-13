@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -11,13 +10,12 @@ var Version = "dev"
 
 var rootCmd = &cobra.Command{
 	Use:     "hp",
-	Short:   "hasaki project",
+	Short:   "Hasaki Project - 高效的项目自动化与工程化管理工具",
 	Version: Version,
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }
