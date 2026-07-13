@@ -20,8 +20,8 @@ Bash 用户:
   永久生效: 
     mkdir -p ~/.local/share/bash-completion/completions
     hp completion bash > ~/.local/share/bash-completion/completions/hp
-	echo 'source /usr/share/bash-completion/bash_completion' >> ~/.bashrc
-	source ~/.bashrc
+    echo 'source /usr/share/bash-completion/bash_completion' >> ~/.bashrc
+    source ~/.bashrc
 
 Zsh 用户:
   安装环境: sudo apt install zsh
@@ -32,21 +32,25 @@ Zsh 用户:
     hp completion zsh > ~/.zfunc/_hp
     echo 'fpath=(~/.zfunc $fpath)' >> ~/.zshrc
     echo 'compinit' >> ~/.zshrc
-	source ~/.zshrc
+    source ~/.zshrc
 
 Fish 用户:
   安装环境: sudo apt install fish
   进入环境: fish
   临时体验: hp completion fish | source
   永久生效: 
+    mkdir -p ~/.config/fish/completions
     hp completion fish > ~/.config/fish/completions/hp.fish
+    source ~/.config/fish/completions/hp.fish
 
 PowerShell 用户:
   安装环境: sudo snap install powershell --classic
   进入环境: pwsh (Windows 默认已内置)
   临时体验: hp completion powershell | Out-String | Invoke-Expression
   永久生效: 
+    New-Item -Type Directory -Force -Path (Split-Path -Parent $PROFILE)
     hp completion powershell >> $PROFILE
+    . $PROFILE
 `,
 	Example: `  # 临时加载 Bash 的自动补全 (当前会话生效)
   source <(hp completion bash)
