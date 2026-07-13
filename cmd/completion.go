@@ -48,8 +48,8 @@ PowerShell 用户:
   source <(hp completion bash)
 
   # 生成 Bash 补全脚本并保存到本地目录 (永久生效)
-	mkdir -p ~/.local/share/bash-completion/completions
-    hp completion bash > ~/.local/share/bash-completion/completions/hp`,
+  mkdir -p ~/.local/share/bash-completion/completions
+  hp completion bash > ~/.local/share/bash-completion/completions/hp`,
 	ValidArgs: []string{"bash", "zsh", "fish", "powershell"},
 	Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 	Run: func(cmd *cobra.Command, args []string) {
