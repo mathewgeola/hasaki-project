@@ -1,6 +1,6 @@
 package main
 
-import "hasaki-project/cmd"
+import "github.com/mathewgeola/hasaki-project/cmd"
 
 func main() {
 	cmd.Execute()

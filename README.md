@@ -3,7 +3,7 @@
 ## 部署
 
 ```bash
-go mod init hasaki-project
+go mod init github.com/mathewgeola/hasaki-project
 
 go get -u github.com/spf13/cobra
 

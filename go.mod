@@ -1,4 +1,4 @@
-module hasaki-project
+module github.com/mathewgeola/hasaki-project
 
 go 1.26.2
 

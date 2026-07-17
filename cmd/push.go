@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"hasaki-project/internal/gitops"
+	"github.com/mathewgeola/hasaki-project/internal/gitops"
 
 	"github.com/spf13/cobra"
 )
